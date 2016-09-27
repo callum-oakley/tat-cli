@@ -12,12 +12,18 @@ tat = do
 
 dispatch :: [(String, [String] -> IO ())]
 dispatch =
-    [ ("view", view)
-    , ("add", add)
+    [ ("add", add)
+    , ("list", list)
     ]
 
 add :: [String] -> IO ()
-add = const (putStrLn "adding...")
+add [task] = appendFile "/Users/callum/Dropbox/.tat/tasks" (task ++ "\n")
 
-view :: [String] -> IO ()
-view = const (putStrLn "viewing...")
+list :: [String] -> IO ()
+list _ = do
+    contents <- readFile "/Users/callum/Dropbox/.tat/tasks"
+    let tasks = lines contents
+        addLineNumber n line =
+            (replicate (2 - length (show n)) ' ' ++ show n) ++ "  " ++ line
+        numberedTasks = zipWith addLineNumber [0..] tasks
+    putStr $ unlines numberedTasks
